@@ -1,2 +1,5 @@
 Flask==1.1.1
 pytest
+
+Werkzeug==0.16.1
+flask-restplus
