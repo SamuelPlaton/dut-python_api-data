@@ -1,10 +1,57 @@
-image: python:3.6.9-alpine
 
+before_script:
+  - docker info
+
+# Variables de version
+variables:
+  LATEST_VER: eci21-3/devops4-api:latest # Dernière version
+  CURRENT_VER: eci21-3/devops4-api:1.1 # Version courante
+  REGISTRY_TOKEN: 44879145-01b8-4019-8af4-b965eccec3c1 # Token crée sur le compte Docker Hub
+  REGISTRY_USER: agaill01 # Identifiant du compte Docker Hub
+
+# Etapes de la pipeline
+# Build le projet, lance les tests, push le projet sur Docker Hub
+# Puis le lance
 stages:
+  - build
   - test
+  - push
+  - run
 
+# Build avec l'image python3, 
+# Le script fais le build avec Docker
+Build:
+  stage: build
+  image: python:3.6.9-alpine
+  script:
+    - docker build -t $LATEST_VER -t $CURRENT_VER .
+
+# Tests de la pipeline
+# Le script lance les tests pytest
 Tests:
   stage: test
   script: 
-    - pip install -r requirements.txt
-    - pytest
+    - docker run --rm $LATEST_VER pytest
+
+# Push sur Docker Hub
+# Se connecte sur le Docker Hub 
+# Puis effectue un push
+Push:
+  stage: push
+  only: 
+    - master
+  script:
+    - echo "$REGISTRY_TOKEN"
+    - docker login -u "$REGISTRY_USER" -p "$REGISTRY_TOKEN"
+    - docker push $LATEST_VER
+    - docker push $CURRENT_VER && docker rmi $CURRENT_VER
+
+# Lance l'image Docker
+Run: 
+  stage: run
+  only: 
+    - master
+  script: 
+    - docker ps -q --filter "name=api" | grep -q . && docker stop api && docker rm -fv api
+    - docker run -d -p 80:5000 --name api $LATEST_VER
+    - docker system prune -f
