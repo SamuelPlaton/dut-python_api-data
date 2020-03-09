@@ -3,8 +3,8 @@ before_script:
 
 # Variables de version
 variables:
-  LATEST_VER: eci21-3/devops4-api:latest # Dernière version
-  CURRENT_VER: eci21-3/devops4-api:1.1 # Version courante
+  LATEST_VER: iuteci213/devops4-api:latest # Dernière version
+  CURRENT_VER: iuteci213/devops4-api:1.1 # Version courante
 
 # Etapes de la pipeline
 # Build le projet, lance les tests, push le projet sur Docker Hub
