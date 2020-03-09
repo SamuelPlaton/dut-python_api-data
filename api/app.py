@@ -9,7 +9,7 @@ api = Api(app, version='1.0', title='ECI ADM/Devops demo API',
 
 
 # Route et fonction plus_one
-@app.route('/plus_one/<x>')
+@api.route('/plus_one/<x>')
 @api.doc(params={'x': 'An Integer'})
 class PlusOne(Resource):
   def get(self, x):
