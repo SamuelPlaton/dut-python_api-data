@@ -9,7 +9,7 @@ api = Api(app, version='1.0', title='ECI ADM/Devops demo API',
 
 
 # Route et fonction plus_one
-@app.route('/plus_one/<int:x>')
+@app.route('/plus_one/<x>')
 @api.doc(params={'x': 'An Integer'})
 class PlusOne(Resource):
   def get(self, x):
@@ -18,11 +18,11 @@ class PlusOne(Resource):
 
 
 # Route et fonction square 
-@api.route('/square/<int:x>')
-@api.doc(params={'x': 'An Integer'}, location='query')
+@api.route('/square/<x>')
+@api.doc(params={'x': 'An Integer'})
 class Square(Resource):
-  def get(self):
-    x = int(request.args.get('x', 1))
+  def get(self, x):
+    x = int(x)
     return {"x": x * x}
 
 if __name__ == "__main__":

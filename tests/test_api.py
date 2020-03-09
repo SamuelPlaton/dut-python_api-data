@@ -17,4 +17,4 @@ def test_plus_one(client):
 def test_square(client):
     """Start with a blank database."""
     result = call(client, '/square/5', {})
-    assert result == 25
+    assert result == {"x": 25}
