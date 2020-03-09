@@ -18,7 +18,7 @@ class PlusOne(Resource):
 
 
 # Route et fonction square 
-@api.route('/square')
+@api.route('/square/<int:x>')
 @api.doc(params={'x': 'An Integer'}, location='query')
 class Square(Resource):
   def get(self):
