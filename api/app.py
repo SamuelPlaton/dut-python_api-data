@@ -14,7 +14,7 @@ api = Api(app, version='1.0', title='ECI ADM/Devops demo API',
 class PlusOne(Resource):
   def get(self, x):
     x = int(x)
-    return {"x": x + 1}
+    return {x + 1}
 
 
 # Route et fonction square 
@@ -23,7 +23,7 @@ class PlusOne(Resource):
 class Square(Resource):
   def get(self):
     x = int(request.args.get('x', 1))
-    return {"x": x * x}
+    return {x * x}
 
 if __name__ == "__main__":
   app.run(host="0.0.0.0", port=int("5000"), debug=True)
