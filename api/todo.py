@@ -1,4 +1,4 @@
-# Voicii un exemple comptet, mais simple, d'une API permettant de gérer une liste de TODO. 
+# Voici un exemple comptet, mais simple, d'une API permettant de gérer une liste de TODO. 
 # Dans cet exemple, vous avez ce qu'il vous faut pour construire l'API de votre projet et la documenter correctement. 
 # J'ai commenté pour vous certaines sections du code pour que vous puissiez le comprendre. N'hésitez pas à poser des questions. 
 
