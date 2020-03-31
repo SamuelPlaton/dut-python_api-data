@@ -7,6 +7,7 @@ import string
 import csv # Nécessaire pour travailler sur des fichiers csv (nos datas)
 import pandas as pd # pip3 install pandas
 import spacy #pip3 install spacy ET python3 -m spacy download en_core_web_md
+import nltk #pip3 install nltk
 
 # Création de l'API, documentation minimale utile à Swagger.
 app = Flask(__name__)
@@ -79,44 +80,65 @@ class Square(Resource):
     x = int(x)
     return {"x": x * x}
 
-# Classe qui sert à récupérer et prétraiter nos datas
+# Retrieve and pretreat data
 @api.route('/fct1')
 class getDatas(Resource):
 	def get(self):
-		# On charge nos stopwords
-		nlp = spacy.load("en_core_web_md") # charge le modèle en anglais
+		# Loading our stopwords
+		nlp = spacy.load("en_core_web_md") # loading the english model
 		spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
-		# On récupère nos datas
+		# Getting back our datas
 		data = self.getData()
-		# On effectue un prétraitement du texte
+		# Pretreatment of the text
 		data['Line'] = data.Line.apply( lambda phrase: self.pretraitement(phrase, nlp, spacy_stopwords) )
-		return data.to_json()
+		print(type(data))
+		for x in data.itertuples():
+			print(x.Character)
+		# Returning our dataframe
+		return data
 
-	# On effectue un prétraitement de nos datas
+	# Pretreatment of our data (lemme and stopwords)
 	def pretraitement(self, phrase, nlp, spacy_stopwords):
 		tokens = [ word.lemma_ for word in nlp(phrase) if word.text.lower() not in spacy_stopwords ]
 		return ' '.join(tokens)
 
-	# On récupère nos datas
+	# Get our datas
 	def getData(self):
-		# On récupère tous nos dialogues dans nos fichiers .csv
+		# Searching our .csv file
 		df1 = pd.read_csv('api/data/south-park/south-park-dialogues.csv')
-		# On concatène tous les fichiers dans une variable
+		# Retrieve all of our files into a variable
 		data = pd.concat( [df1[0:20]] )
 		data.sample(1)
-		# On récupère seulement les personnages et les lignes de dialogue
+		# Getting only characters and lines
 		data = data[['Character','Line']].copy()
-		# On retourne nos datas
+		# Return our data
 		return data 	
 
-# Classe qui sert à retourner le vocabulaire d'un personnage
-@api.route('/vocabulary')
-@api.doc(params={'c': 'A Character name'})
+# Return the vocabulary of a character
+@api.route('/vocabulary/<c>')
+@api.doc(params={'c': 'A Character'})
 class characterVocabulary(Resource):
 	def get(self, c):
-		data = getDatas()
-		return data
+		# Loading our datas
+		dataObject = getDatas()
+		data = dataObject.get()
+		# Preparing the sentences of our character
+		characterData = []
+		# Picking the sentences of our character
+		for x in data.itertuples() :
+			if x.Character == c :
+				# Word by word
+				sentence = x.Line.split(" ")
+				for word in sentence :
+					# Without punctuation and spaces
+					if word not in '!,...?":;0123456789\\\n':
+						characterData.append(word)
+		freq = nltk.FreqDist(characterData)
+		vocabulary = freq.most_common(3)
+		return vocabulary
 
+
+# Après on cherchera à calculer l'importance d'un personnage dans la sérié
 if __name__ == "__main__":
   app.run(host="0.0.0.0", port=int("5000"), debug=True)
 
