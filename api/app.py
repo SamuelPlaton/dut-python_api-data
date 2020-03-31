@@ -79,9 +79,9 @@ class Square(Resource):
     x = int(x)
     return {"x": x * x}
 
+# Classe qui sert à récupérer et prétraiter nos datas
 @api.route('/fct1')
 class getDatas(Resource):
-
 	def get(self):
 		# On charge nos stopwords
 		nlp = spacy.load("en_core_web_md") # charge le modèle en anglais
@@ -90,7 +90,7 @@ class getDatas(Resource):
 		data = self.getData()
 		# On effectue un prétraitement du texte
 		data['Line'] = data.Line.apply( lambda phrase: self.pretraitement(phrase, nlp, spacy_stopwords) )
-		return data[0:20].to_json()
+		return data.to_json()
 
 	# On effectue un prétraitement de nos datas
 	def pretraitement(self, phrase, nlp, spacy_stopwords):
@@ -108,6 +108,14 @@ class getDatas(Resource):
 		data = data[['Character','Line']].copy()
 		# On retourne nos datas
 		return data 	
+
+# Classe qui sert à retourner le vocabulaire d'un personnage
+@api.route('/vocabulary')
+@api.doc(params={'c': 'A Character name'})
+class characterVocabulary(Resource):
+	def get(self, c):
+		data = getDatas()
+		return data
 
 if __name__ == "__main__":
   app.run(host="0.0.0.0", port=int("5000"), debug=True)
