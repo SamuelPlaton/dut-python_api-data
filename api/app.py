@@ -107,7 +107,7 @@ class getDatas(Resource):
 		# Searching our .csv file
 		df1 = pd.read_csv('api/data/south-park/south-park-dialogues.csv')
 		# Retrieve all of our files into a variable
-		data = pd.concat( [df1[0:20]] )
+		data = pd.concat( [df1[0:600]] )
 		data.sample(1)
 		# Getting only characters and lines
 		data = data[['Character','Line']].copy()
@@ -122,6 +122,22 @@ class characterVocabulary(Resource):
 		# Loading our datas
 		dataObject = getDatas()
 		data = dataObject.get()
+
+		# Getting the words of all of our data
+		words = []
+		for x in data.itertuples() :
+				# Word by word
+				sentence = x.Line.split(" ")
+				for word in sentence :
+					# Without punctuation and spaces
+					if word not in '!,...?":;0123456789\\\n':
+						words.append(word)
+
+		# Getting the most common words of our data
+		freq = nltk.FreqDist(words)
+		freq = freq.most_common(5)
+		print(freq)
+
 		# Preparing the sentences of our character
 		characterData = []
 		# Picking the sentences of our character
@@ -133,12 +149,33 @@ class characterVocabulary(Resource):
 					# Without punctuation and spaces
 					if word not in '!,...?":;0123456789\\\n':
 						characterData.append(word)
-		freq = nltk.FreqDist(characterData)
-		vocabulary = freq.most_common(3)
+		# Getting only the most common words of this character
+		freq_character = nltk.FreqDist(characterData)
+		vocabulary = freq_character.most_common(10)
+
+		# Useless ?
+		freq_totale = nltk.Counter()
+		for word, frequency_distribution in freq:
+			print("word : ", word)
+			print("fq : ", frequency_distribution)
+
+		# Browse our most common character words
+		# Delete it if it's too common
+		i = 0
+		for word, frequency in vocabulary :
+			for word2, freq2 in freq :
+				if word == word2 :
+					print(word)
+					print(type(vocabulary))
+					vocabulary.remove(vocabulary[i])
+			i += 1
+
 		return vocabulary
 
 
-# Après on cherchera à calculer l'importance d'un personnage dans la sérié
+# Après on cherchera à calculer l'importance d'un personnage dans la série
+
+
 if __name__ == "__main__":
   app.run(host="0.0.0.0", port=int("5000"), debug=True)
 
