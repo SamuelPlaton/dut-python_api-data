@@ -81,7 +81,6 @@ class Square(Resource):
     return {"x": x * x}
 
 # Retrieve and pretreat data
-@api.route('/fct1')
 class getDatas(Resource):
 	def get(self):
 		# Loading our stopwords
@@ -91,15 +90,11 @@ class getDatas(Resource):
 		data = self.getData()
 		# Pretreatment of the text
 		data['Line'] = data.Line.apply( lambda phrase: self.pretraitement(phrase, nlp, spacy_stopwords) )
-		print(type(data))
-		for x in data.itertuples():
-			print(x.Character)
-		# Returning our dataframe
 		return data
 
 	# Pretreatment of our data (lemme and stopwords)
 	def pretraitement(self, phrase, nlp, spacy_stopwords):
-		tokens = [ word.lemma_ for word in nlp(phrase) if word.text.lower() not in spacy_stopwords ]
+		tokens = [ word.lemma_.lower() for word in nlp(phrase) if word.text.lower() not in spacy_stopwords ]
 		return ' '.join(tokens)
 
 	# Get our datas
@@ -107,24 +102,17 @@ class getDatas(Resource):
 		# Searching our .csv file
 		df1 = pd.read_csv('api/data/south-park/south-park-dialogues.csv')
 		# Retrieve all of our files into a variable
-		data = pd.concat( [df1[0:600]] )
+		data = pd.concat( [df1[0:2000]] ) # We take only the 2 000 first lines, else it's too long to treat
 		data.sample(1)
 		# Getting only characters and lines
 		data = data[['Character','Line']].copy()
 		# Return our data
-		return data 	
+		return data
 
-# Return the vocabulary of a character
-@api.route('/vocabulary/<c>')
-@api.doc(params={'c': 'A Character'})
-class characterVocabulary(Resource):
-	def get(self, c):
-		# Loading our datas
-		dataObject = getDatas()
-		data = dataObject.get()
-
+	def getMostCommonData(self, number):
 		# Getting the words of all of our data
 		words = []
+		data = self.get()
 		for x in data.itertuples() :
 				# Word by word
 				sentence = x.Line.split(" ")
@@ -135,43 +123,54 @@ class characterVocabulary(Resource):
 
 		# Getting the most common words of our data
 		freq = nltk.FreqDist(words)
-		freq = freq.most_common(5)
-		print(freq)
+		return freq.most_common(number)
 
-		# Preparing the sentences of our character
-		characterData = []
-		# Picking the sentences of our character
-		for x in data.itertuples() :
-			if x.Character == c :
+	# Get the data of a specific character
+	def getDataCharacter(self, c):
+		data = self.get() # Get all the data
+		characterData = [] # Prepare his words
+		for x in data.itertuples() : # Browse all the data
+			if x.Character == c : # If the data is the character one
 				# Word by word
-				sentence = x.Line.split(" ")
+				sentence = x.Line.split(" ") # split the words
 				for word in sentence :
 					# Without punctuation and spaces
-					if word not in '!,...?":;0123456789\\\n':
-						characterData.append(word)
-		# Getting only the most common words of this character
-		freq_character = nltk.FreqDist(characterData)
-		vocabulary = freq_character.most_common(10)
+					if word not in '!,...?":;0123456789\\\n': # if it's not a punctuation
+						characterData.append(word) # we take it
+		return characterData
 
-		# Useless ?
-		freq_totale = nltk.Counter()
-		for word, frequency_distribution in freq:
-			print("word : ", word)
-			print("fq : ", frequency_distribution)
+# Return the vocabulary of a character
+@api.route('/vocabulary/<c>')
+@api.doc(params={'c': 'A Character'})
+class characterVocabulary(Resource):
+	def get(self, c):
+		# Loading our datas
+		dataObject = getDatas() # Our object
+		freqTotal = dataObject.getMostCommonData(30) # The 30 most common words of our data
+		characterData = dataObject.getDataCharacter(c) # The data of a character
+
+		# Getting the FreqDist of this character
+		freqCharacter = nltk.FreqDist(characterData)	
 
 		# Browse our most common character words
 		# Delete it if it's too common
 		i = 0
-		for word, frequency in vocabulary :
-			for word2, freq2 in freq :
-				if word == word2 :
-					print(word)
-					print(type(vocabulary))
-					vocabulary.remove(vocabulary[i])
+		toDelete = []
+		for word in freqCharacter :
+			for word2, freq2 in freqTotal :
+				# If the most common words of a character is in the most common words
+				# of the serie, we remove it
+				if word == word2 : 
+					toDelete.append(word) # First we add it to a list during the iteration
 			i += 1
 
+		# Then we delete it
+		for element in toDelete:
+			freqCharacter.pop(element)
+		# Getting the 10 most common words of this character
+		vocabulary = freqCharacter.most_common(10)
+		# Return the vocabulary of the character
 		return vocabulary
-
 
 # Après on cherchera à calculer l'importance d'un personnage dans la série
 
