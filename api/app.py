@@ -1,4 +1,4 @@
-from flask import request, Flask
+from flask import request, Flask, jsonify
 from flask_restplus import Api, Resource, fields
 from werkzeug.contrib.fixers import ProxyFix
 
@@ -8,6 +8,7 @@ import csv # Nécessaire pour travailler sur des fichiers csv (nos datas)
 import pandas as pd # pip3 install pandas
 import spacy #pip3 install spacy ET python3 -m spacy download en_core_web_md
 import nltk #pip3 install nltk
+from flask_swagger import swagger
 
 # Création de l'API, documentation minimale utile à Swagger.
 app = Flask(__name__)
@@ -19,7 +20,7 @@ api = Api(app, version='1.0', title='ECI API',
 # Création d'un namespace, ajoute : 
 # un namespace de routes /fct1 (localhost:5000/fct1) qui sera ensuite utilisé ensuite avec @ns.route
 # création du namespace dans la documentation swagger
-ns = api.namespace('fct1', description='Fonctionnalité 1 de l API')
+ns1 = api.namespace('/vocabulary/<c>', description='Fonctionnalité 1 de l API')
 
 
 # Déclaration d'un modèle de donnée utilisé dans l'API, il sert à :
@@ -63,22 +64,17 @@ class TodoDAO(object):
         todo = self.get(id)
         self.todos.remove(todo)
 
-# Route et fonction plus_one
-@api.route('/plus_one/<x>')
-@api.doc(params={'x': 'An Integer'})
-class PlusOne(Resource):
-  def get(self, x):
-    x = int(x)
-    return {"x": x + 1}
-
-
-# Route et fonction square 
-@api.route('/square/<x>')
-@api.doc(params={'x': 'An Integer'})
-class Square(Resource):
-  def get(self, x):
-    x = int(x)
-    return {"x": x * x}
+# Get the swagger doc
+@api.route('/spec')
+class getSpec(Resource):
+	def get(self):
+		swag = swagger(app)
+		# Informations about the API
+		swag['info']['version'] = "1.0"
+		swag['info']['title'] = "Samuel Platon - ECIB1 - My API"
+		# Informations about functionnalities
+		swag['info']['functionnality 1'] = " Return the vocabulary of a specific character"
+		return jsonify(swag)
 
 # Retrieve and pretreat data
 class getDatas(Resource):
