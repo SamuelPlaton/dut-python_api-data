@@ -1,6 +1,7 @@
 from flask import request, Flask, jsonify
 from flask_restplus import Api, Resource, fields
 from werkzeug.contrib.fixers import ProxyFix
+import requests
 
 import json
 import string
@@ -167,6 +168,30 @@ class characterVocabulary(Resource):
 		vocabulary = freqCharacter.most_common(10)
 		# Return the vocabulary of the character
 		return vocabulary
+
+# We are trying to find which character say the sentence in input
+@api.route('/findCharacter')
+class characterRecognition(Resource):
+	def get(self):
+		# Loading our datas without treatment
+		dataObject = getDatas()
+		data = dataObject.getData()
+
+		# We are setting our list of characters
+		characters = []
+
+		# We ask the user to put a sentence in the terminal
+		print(" Enter a sentence : ")
+		sentence = input()
+
+		# We browse our data
+		for x in data.itertuples() :
+			# If we find which character said the sentence
+			if sentence.lower() in x.Line.lower():
+				# We add him and the sentence to the list
+				characters.append(x.Character+" : "+x.Line)
+		# Then we return the list
+		return characters
 
 # Après on cherchera à calculer l'importance d'un personnage dans la série
 
