@@ -10,6 +10,7 @@ import pandas as pd # pip3 install pandas
 import spacy #pip3 install spacy ET python3 -m spacy download en_core_web_md
 import nltk #pip3 install nltk
 from flask_swagger import swagger
+from decimal import *
 
 # Création de l'API, documentation minimale utile à Swagger.
 app = Flask(__name__)
@@ -17,12 +18,6 @@ app.wsgi_app = ProxyFix(app.wsgi_app)
 api = Api(app, version='1.0', title='ECI API',
   description='API de projet DEVOPS4 - ECI B1 Samuel Platon',
 )
-
-# Création d'un namespace, ajoute : 
-# un namespace de routes /fct1 (localhost:5000/fct1) qui sera ensuite utilisé ensuite avec @ns.route
-# création du namespace dans la documentation swagger
-ns1 = api.namespace('/vocabulary/<c>', description='Fonctionnalité 1 de l API')
-
 
 # Déclaration d'un modèle de donnée utilisé dans l'API, il sert à :
 # - Récupérer automatiquement des paramètres (vous le verrez dans la requête POST)
@@ -65,17 +60,6 @@ class TodoDAO(object):
         todo = self.get(id)
         self.todos.remove(todo)
 
-# Get the swagger doc
-@api.route('/spec')
-class getSpec(Resource):
-	def get(self):
-		swag = swagger(app)
-		# Informations about the API
-		swag['info']['version'] = "1.0"
-		swag['info']['title'] = "Samuel Platon - ECIB1 - My API"
-		# Informations about functionnalities
-		swag['info']['functionnality 1'] = " Return the vocabulary of a specific character"
-		return jsonify(swag)
 
 # Retrieve and pretreat data
 class getDatas(Resource):
@@ -136,6 +120,13 @@ class getDatas(Resource):
 						characterData.append(word) # we take it
 		return characterData
 
+	def totalWords(self, data):
+		totalWords = 0
+		for x in data.itertuples():
+			words = x.Line.split(" ")
+			totalWords += len(words)
+		return totalWords
+
 # Return the vocabulary of a character
 @api.route('/vocabulary/<c>')
 @api.doc(params={'c': 'A Character'})
@@ -193,7 +184,43 @@ class characterRecognition(Resource):
 		# Then we return the list
 		return characters
 
-# Après on cherchera à calculer l'importance d'un personnage dans la série
+# We try to calculate the % on speech of the 10 most importants characters
+# It's the 4th "free" function, it's useful to see really which characters are in the middle
+# of theses series and by how much, we try to quantify the importance of a character here
+# This data can be useful in the future if we want to see if a character has a specific episode about him
+@api.route('/timeSpeech')
+class timeSpeech(Resource):
+	def get(self):
+		# Loading our datas without treatment
+		dataObject = getDatas()
+		data = dataObject.getData()
+		totalWords = dataObject.totalWords(data)
+
+		# Getting a dict() of all characters and number of Words
+		charactersLines = self.separateCharacters(data)
+		df = pd.DataFrame.from_dict(charactersLines, orient='index')
+		df = df.sort_values(by=["Total"], ascending=False)
+		# Picking only the 10 who speak the most
+		df = df[0:9]
+		# Getting now the frequency with totalWords
+		freq = dict()
+		for character, value in df.itertuples():
+			freq[character] = str(round((value/totalWords)*100, 2))+"%"
+		# Returning our frequency
+		return freq
+
+	def separateCharacters(self, data):
+		charactersLines = dict()
+
+		for x in data.itertuples():
+			charactersLines[x.Character] = {"Total" : 0}
+
+		for x in data.itertuples():
+			words = x.Line.split(" ")
+			charactersLines[x.Character] = {"Total" : charactersLines[x.Character]["Total"]+len(words)}
+		return charactersLines
+
+	# Topic Model par saison et episode
 
 
 if __name__ == "__main__":
