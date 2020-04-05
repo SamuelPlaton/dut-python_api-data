@@ -10,7 +10,8 @@ import pandas as pd # pip3 install pandas
 import spacy #pip3 install spacy ET python3 -m spacy download en_core_web_md
 import nltk #pip3 install nltk
 from flask_swagger import swagger
-from decimal import *
+from gensim.corpora import Dictionary #pip3 install gensim
+from gensim.utils import simple_preprocess
 
 # Création de l'API, documentation minimale utile à Swagger.
 app = Flask(__name__)
@@ -61,6 +62,7 @@ class TodoDAO(object):
         self.todos.remove(todo)
 
 
+
 # Retrieve and pretreat data
 class getDatas(Resource):
 	def get(self):
@@ -83,35 +85,38 @@ class getDatas(Resource):
 		# Searching our .csv file
 		df1 = pd.read_csv('api/data/south-park/south-park-dialogues.csv')
 		# Retrieve all of our files into a variable
-		data = pd.concat( [df1[0:2000]] ) # We take only the 2 000 first lines, else it's too long to treat
+		data = pd.concat( [df1] ) # We take only the 2 000 first lines, else it's too long to treat
 		data.sample(1)
-		# Getting only characters and lines
-		data = data[['Character','Line']].copy()
+		# Getting the desired data
+		data = data[['Season', 'Episode', 'Character','Line']].copy()
 		# Return our data
 		return data
 
-	def getMostCommonData(self, number):
-		# Getting the words of all of our data
+	@api.doc(params={'number': 'The number of common words', 's' : 'number of the season', 'e': 'number of the episode'})
+	def getMostCommonData(self, number, s, e):
+		# Getting the words of an episode
 		words = []
 		data = self.get()
 		for x in data.itertuples() :
 				# Word by word
 				sentence = x.Line.split(" ")
 				for word in sentence :
-					# Without punctuation and spaces
-					if word not in '!,...?":;0123456789\\\n':
-						words.append(word)
+					if x.Season == s and x.Episode == e:
+						# Without punctuation and spaces
+						if word not in '!,...?":;0123456789\\\n':
+							words.append(word)
 
 		# Getting the most common words of our data
 		freq = nltk.FreqDist(words)
 		return freq.most_common(number)
 
-	# Get the data of a specific character
-	def getDataCharacter(self, c):
+	# Get the data of a specific character in a specific episode
+	@api.doc(params={'c': 'A Character', 's' : 'number of the season', 'e': 'number of the episode'})
+	def getDataCharacter(self, c, s, e):
 		data = self.get() # Get all the data
 		characterData = [] # Prepare his words
 		for x in data.itertuples() : # Browse all the data
-			if x.Character == c : # If the data is the character one
+			if x.Character == c and x.Season == s and x.Episode == e: # If the data is the character one
 				# Word by word
 				sentence = x.Line.split(" ") # split the words
 				for word in sentence :
@@ -120,6 +125,22 @@ class getDatas(Resource):
 						characterData.append(word) # we take it
 		return characterData
 
+	# Get the data of a specific episode
+	@api.doc(params={'data' : 'the data of the serie', 's' : 'number of the season', 'e': 'number of the episode'})
+	def getDataEpisode(self, data, s, e):
+		data = self.get() # Get all the data
+		episodeData = [] # Prepare his words
+		for x in data.itertuples() : # Browse all the data
+			if x.Season == s and x.Episode == e: # If the data is the character one
+				# Word by word
+				sentence = x.Line.split(" ") # split the words
+				for word in sentence :
+					# Without punctuation and spaces
+					if word not in '!,...?":;0123456789\\\n': # if it's not a punctuation
+						episodeData.append(word) # we take it
+		return episodeData
+
+
 	def totalWords(self, data):
 		totalWords = 0
 		for x in data.itertuples():
@@ -127,15 +148,15 @@ class getDatas(Resource):
 			totalWords += len(words)
 		return totalWords
 
-# Return the vocabulary of a character
-@api.route('/vocabulary/<c>')
-@api.doc(params={'c': 'A Character'})
+# Return the vocabulary of a character in a episode of a season
+@api.route('/vocabulary/<c>/<s>/<e>', doc={"description": "Return the vocabulary of a character in a episode of a season"})
+@api.doc(params={'c': 'A Character', 's' : 'number of the season', 'e': 'number of the episode'})
 class characterVocabulary(Resource):
-	def get(self, c):
+	def get(self, c, s, e):
 		# Loading our datas
 		dataObject = getDatas() # Our object
-		freqTotal = dataObject.getMostCommonData(30) # The 30 most common words of our data
-		characterData = dataObject.getDataCharacter(c) # The data of a character
+		freqTotal = dataObject.getMostCommonData(10, s, e) # The 10 most common words of our episode
+		characterData = dataObject.getDataCharacter(c, s, e) # The data of a character in a episode
 
 		# Getting the FreqDist of this character
 		freqCharacter = nltk.FreqDist(characterData)	
@@ -161,7 +182,7 @@ class characterVocabulary(Resource):
 		return vocabulary
 
 # We are trying to find which character say the sentence in input
-@api.route('/findCharacter')
+@api.route('/findCharacter', doc={"description": "find which caracters say the sentencu in input (terminal) in which seasons/episodes"})
 class characterRecognition(Resource):
 	def get(self):
 		# Loading our datas without treatment
@@ -180,7 +201,7 @@ class characterRecognition(Resource):
 			# If we find which character said the sentence
 			if sentence.lower() in x.Line.lower():
 				# We add him and the sentence to the list
-				characters.append(x.Character+" : "+x.Line)
+				characters.append("Season "+x.Season+" Episode "+x.Episode+" | "+x.Character+" : "+x.Line)
 		# Then we return the list
 		return characters
 
@@ -188,7 +209,7 @@ class characterRecognition(Resource):
 # It's the 4th "free" function, it's useful to see really which characters are in the middle
 # of theses series and by how much, we try to quantify the importance of a character here
 # This data can be useful in the future if we want to see if a character has a specific episode about him
-@api.route('/timeSpeech')
+@api.route('/timeSpeech', doc={"description": "find the % time of speech of the 10 most important characters"})
 class timeSpeech(Resource):
 	def get(self):
 		# Loading our datas without treatment
@@ -201,7 +222,7 @@ class timeSpeech(Resource):
 		df = pd.DataFrame.from_dict(charactersLines, orient='index')
 		df = df.sort_values(by=["Total"], ascending=False)
 		# Picking only the 10 who speak the most
-		df = df[0:9]
+		df = df[0:10]
 		# Getting now the frequency with totalWords
 		freq = dict()
 		for character, value in df.itertuples():
@@ -209,6 +230,7 @@ class timeSpeech(Resource):
 		# Returning our frequency
 		return freq
 
+	@api.doc(params={'data': 'The data of our serie'})
 	def separateCharacters(self, data):
 		charactersLines = dict()
 
@@ -221,6 +243,44 @@ class timeSpeech(Resource):
 		return charactersLines
 
 	# Topic Model par saison et episode
+@api.route('/topic/<s>/<e>', doc={"description": "find the topic of an episode"})
+@api.doc(params={'s' : 'number of the season', 'e': 'number of the episode'})
+class topicModel(Resource):
+	def get(self, s, e):
+		# Loading our datas without treatment
+		dataObject = getDatas()
+		data = dataObject.getData()
+		dataEpisode = dataObject.getDataEpisode(data, s, e)
+		#dataEpisode2 = dataObject.getDataEpisode(data, 10, 2)
+		dataEpisode2 = dataEpisode
+		episodes = []
+		episodes.append([token for token in self.preprocessEpisode(dataEpisode)])
+		episodes.append([token for token in self.preprocessEpisode(dataEpisode2)])
+		print(len(episodes))
+		print("--------------")
+		episodeDictionary= Dictionary(episodes)
+		episodeDictionary.filter_extremes(no_below = 20, no_above = 0.1)
+		model_corpus=[]
+		for episode in episodes:
+			model_corpus.append(episodeDictionary.doc2bow(episode))
+		#print([episodeDictionary[index] for index, nb in model_corpus[1]])
+		#print("--------------")
+		#print(episodeDictionary[1])
+		return 0
+
+	def preprocessEpisode(self, text):
+		text = " ".join(text)
+		text = simple_preprocess(text)
+		# Loading our stopwords
+		nlp = spacy.load("en_core_web_md") # loading the english model
+		spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
+
+		return [token for token in text if token not in spacy_stopwords]
+
+
+
+
+
 
 
 if __name__ == "__main__":
