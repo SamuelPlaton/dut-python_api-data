@@ -12,6 +12,7 @@ import nltk #pip3 install nltk
 from flask_swagger import swagger
 from gensim.corpora import Dictionary #pip3 install gensim
 from gensim.utils import simple_preprocess
+from gensim.models import LdaModel
 
 # Création de l'API, documentation minimale utile à Swagger.
 app = Flask(__name__)
@@ -85,7 +86,7 @@ class getDatas(Resource):
 		# Searching our .csv file
 		df1 = pd.read_csv('api/data/south-park/south-park-dialogues.csv')
 		# Retrieve all of our files into a variable
-		data = pd.concat( [df1] ) # We take only the 2 000 first lines, else it's too long to treat
+		data = pd.concat( [df1[0:4000]] ) # We take only the 2 000 first lines, else it's too long to treat
 		data.sample(1)
 		# Getting the desired data
 		data = data[['Season', 'Episode', 'Character','Line']].copy()
@@ -140,7 +141,7 @@ class getDatas(Resource):
 						episodeData.append(word) # we take it
 		return episodeData
 
-
+	# Return the number of total words in the data
 	def totalWords(self, data):
 		totalWords = 0
 		for x in data.itertuples():
@@ -242,7 +243,7 @@ class timeSpeech(Resource):
 			charactersLines[x.Character] = {"Total" : charactersLines[x.Character]["Total"]+len(words)}
 		return charactersLines
 
-	# Topic Model par saison et episode
+# Topic Model of an episode of a season
 @api.route('/topic/<s>/<e>', doc={"description": "find the topic of an episode"})
 @api.doc(params={'s' : 'number of the season', 'e': 'number of the episode'})
 class topicModel(Resource):
@@ -251,30 +252,38 @@ class topicModel(Resource):
 		dataObject = getDatas()
 		data = dataObject.getData()
 		dataEpisode = dataObject.getDataEpisode(data, s, e)
-		#dataEpisode2 = dataObject.getDataEpisode(data, 10, 2)
-		dataEpisode2 = dataEpisode
-		episodes = []
-		episodes.append([token for token in self.preprocessEpisode(dataEpisode)])
-		episodes.append([token for token in self.preprocessEpisode(dataEpisode2)])
-		print(len(episodes))
-		print("--------------")
-		episodeDictionary= Dictionary(episodes)
-		episodeDictionary.filter_extremes(no_below = 20, no_above = 0.1)
-		model_corpus=[]
-		for episode in episodes:
-			model_corpus.append(episodeDictionary.doc2bow(episode))
-		#print([episodeDictionary[index] for index, nb in model_corpus[1]])
-		#print("--------------")
-		#print(episodeDictionary[1])
-		return 0
+		
+		# preprocess of the words of the episode
+		tokenEpisode= []		
+		tokenEpisode.append([token for token in self.preprocessEpisode(dataEpisode)])
+		dictionnaryEpisode = Dictionary(tokenEpisode)
+
+		# creating our model corpus
+		model_corpus = []
+		for episode in tokenEpisode:
+			model_corpus.append(dictionnaryEpisode.doc2bow(episode))
+
+		# Creating our list of topics with the LDA models
+		topicsList = []
+		lda_model = LdaModel(corpus=model_corpus, id2word=dictionnaryEpisode, num_topics=3) # We choose to get only the 3 most significant topics
+		for topic_id, topic_keywords in lda_model.show_topics(formatted=False):
+			string = "=== Pour le sujet '"+str(lda_model.show_topic(topic_id, topn=1)[0][0])+"', les mots clefs representatifs sont ==="
+			topicsList.append(string)
+			# Broswe the keywords of each topic
+			for keyword in topic_keywords:
+				string = "-> "+str(keyword[0])+" ("+str(keyword[1])+")"
+				topicsList.append(string)
+		# Return our list of topics
+		return topicsList
 
 	def preprocessEpisode(self, text):
+		# Join our tokens in a single string in order to do a simple preprocess
 		text = " ".join(text)
 		text = simple_preprocess(text)
 		# Loading our stopwords
 		nlp = spacy.load("en_core_web_md") # loading the english model
 		spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
-
+		# Returning our tokens without the spacy stopwords
 		return [token for token in text if token not in spacy_stopwords]
 
 
