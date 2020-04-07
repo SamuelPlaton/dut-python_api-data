@@ -20,13 +20,15 @@ Il est aussi nécéssaire de faire 'python3 -m spacy download en_core_web_md' af
 
 ## **Fonctionnalités :** 
 
-En paramètres, <c> représente un personnage, <s> un numéro de saison et <e> un numéro d'épisode.
+En paramètres, c représente un personnage, s un numéro de saison et e un numéro d'épisode.
 
 ### Vocabulaire d'un personnage :speech_balloon: :
 
-	**Route :** 0.0.0.0:5000/vocabulary/<c>/<s>/<e> *(exemple : 0.0.0.0:5000/vocabulary/Cartman/10/1)*
-	Nb : Pour cette fonctionnalités les mots traités sont lemmatisés et les stopwords retirés.
-	Par rapport à un épisode, cette fonctionnalité prend les 10 mots les plus prononcés et les enlève des mots les plus prononcés de notre personnage <c> dans l'épisode. Puis nous retournons les 10 mots les plus prononcés restants de notre personnage <c> de cet épisode, ce qui permet d'obtenir un vocabulaire non pas général mais réellement représentatif d'un personnage pour un épisode.
+**Route :** 0.0.0.0:5000/vocabulary/<c>/<s>/<e> *(exemple : 0.0.0.0:5000/vocabulary/Cartman/10/1)*
+Nb : Pour cette fonctionnalités les mots traités sont lemmatisés et les stopwords retirés.
+Par rapport à un épisode, cette fonctionnalité prend les 10 mots les plus prononcés et les enlève des mots les plus prononcés de notre personnage <c> dans l'épisode. Puis nous retournons les 10 mots les plus prononcés restants de notre personnage <c> de cet épisode, ce qui permet d'obtenir un vocabulaire non pas général mais réellement représentatif d'un personnage pour un épisode.
+
+
 
 ### Retrouver le personnage :eyes: : 
 	**Route :** 0.0.0.0:5000/findCharacter
