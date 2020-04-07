@@ -11,9 +11,11 @@ Pour faire fonctionner le projet, il est nécessaire de lancer les requirements 
 pandas, spacy, nltk, gensim
 Il est aussi nécéssaire de faire 'python3 -m spacy download en_core_web_md' afin de télécharger les stopwords
 
-**/!\ Mon API ne travaille que sur les données de South Park** </br>
-**/!\ Pour que ce projet fonctionne, voici comment doivent être placées ces données : 'api/data/south-park/south-park-dialogues.csv'** </br>
-**/!\ Il est possible que certaines fonctionnalités aient un temps de traitement relativement long (~1 minute)** </br>
+**/!\ Mon API ne travaille que sur les données de South Park**   
+
+**/!\ Pour que ce projet fonctionne, voici comment doivent être placées ces données : 'api/data/south-park/south-park-dialogues.csv'**   
+
+**/!\ Il est possible que certaines fonctionnalités aient un temps de traitement relativement long (~1 minute)**   
 
 
 ## **Fonctionnalités :** 
@@ -47,11 +49,11 @@ En paramètres, <c> représente un personnage, <s> un numéro de saison et <e> u
 
 Ma démarche de travail pour mon API a été de développer une classe par fonctionnalité, contenant chacunes une ou plusieurs méthodes selon le besoin au niveau de la propreté du code et toutes rigoureusement commentées en anglais. Une classe getData ne contenant pas de route est aussi créée étant la base de mon API, elle permet de récupérer tous les dialogues, les prétraiter, ou encore de récupérer les dialogues spécifiques à un épisode, ou à un couple épisode / personnage etc...
 
-##**Organisation du développement :**
+## **Organisation du développement :**
 
 En terme d'organisation de développement, j'ai travaillé sur les fonctionnalités une à une, en implémentant leur documentation swagger petit à petit et en faisant des tests seulement manuel, les classes de test étant arrivées après. Chacunes des fonctionnalités possède sa branche, de même pour d'autres options (documentation, swagger, récupération de données...).
 
-<h2> **Priorités :** </h2>
+## **Priorités :** 
 Ma priorité dans ce projet d'API a été de développer les fonctionnalités et de les faire marcher, pour cela je suis resté sur le jeu 'South Park' uniquement. Etant moins à l'aise sur le fonctionnement des tests ou de la configuration de l'API, j'y ai alors passé moins de temps.
 
 ##**Difficultées rencontrées :**
