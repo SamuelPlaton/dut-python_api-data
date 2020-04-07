@@ -86,7 +86,7 @@ class getDatas(Resource):
 		# Searching our .csv file
 		df1 = pd.read_csv('api/data/south-park/south-park-dialogues.csv')
 		# Retrieve all of our files into a variable
-		data = pd.concat( [df1] ) # We take only the 2 000 first lines, else it's too long to treat
+		data = pd.concat( [df1[0:4000]] ) # We take only the 4 000 first lines, else it's too long to treat
 		data.sample(1)
 		# Getting the desired data
 		data = data[['Season', 'Episode', 'Character','Line']].copy()
@@ -142,6 +142,7 @@ class getDatas(Resource):
 		return episodeData
 
 	# Return the number of total words in the data
+	@api.doc(params={'data': 'The data of the whole serie'})
 	def totalWords(self, data):
 		totalWords = 0
 		for x in data.itertuples():
@@ -194,9 +195,7 @@ class characterRecognition(Resource):
 		characters = []
 
 		# We ask the user to put a sentence in the terminal
-		print(" Enter a sentence : ")
 		sentence = input()
-
 		# We browse our data
 		for x in data.itertuples() :
 			# If we find which character said the sentence
@@ -278,15 +277,16 @@ class topicModel(Resource):
 		# Return our list of topics
 		return topicsList
 
-	def preprocessEpisode(self, text):
+	@api.doc(params={'data': 'The data of an episode'})
+	def preprocessEpisode(self, data):
 		# Join our tokens in a single string in order to do a simple preprocess
-		text = " ".join(text)
-		text = simple_preprocess(text)
+		data = " ".join(data)
+		data = simple_preprocess(data)
 		# Loading our stopwords
 		nlp = spacy.load("en_core_web_md") # loading the english model
 		spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
 		# Returning our tokens without the spacy stopwords
-		return [token for token in text if token not in spacy_stopwords]
+		return [token for token in data if token not in spacy_stopwords]
 
 
 

@@ -15,7 +15,9 @@ Il est aussi nécéssaire de faire 'python3 -m spacy download en_core_web_md' af
 
 **/!\ Pour que ce projet fonctionne, voici comment doivent être placées ces données : 'api/data/south-park/south-park-dialogues.csv'**   
 
-**/!\ Il est possible que certaines fonctionnalités aient un temps de traitement relativement long (~1 minute)**   
+**/!\ Il est possible que certaines fonctionnalités aient un temps de traitement relativement long (~1 minute)**  
+
+**/!\ Pour gagner du temps pendant les tests,  dans la méthode getData() de la classe GetDatas la ligne 'data = pd.concat( [df1[0:4000]] )' permet de ne prendre que les 4000 premières lignes à traiter, les épisodes S10E01 et S10E02 sont 100% fonctionnels avec ces lignes**  
 
 
 ## **Fonctionnalités :** 
