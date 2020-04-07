@@ -58,5 +58,5 @@ En terme d'organisation de développement, j'ai travaillé sur les fonctionnalit
 ## **Priorités :** 
 Ma priorité dans ce projet d'API a été de développer les fonctionnalités et de les faire marcher, pour cela je suis resté sur le jeu 'South Park' uniquement. Etant moins à l'aise sur le fonctionnement des tests ou de la configuration de l'API, j'y ai alors passé moins de temps.
 
-##**Difficultées rencontrées :**
+## **Difficultées rencontrées :**
 Ma principale difficulté rencontrée a été la prise en main de l'API afin de comprendre son fonctionnement.
