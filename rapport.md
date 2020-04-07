@@ -2,7 +2,7 @@
 
 
 
-##**Faire fonctionner le projet :**
+##Faire fonctionner le projet :
 
 Pour faire fonctionner le projet, il est nécessaire de lancer les requirements afin d'installer ces paquets supplémentaires :
 pandas, spacy, nltk, gensim
