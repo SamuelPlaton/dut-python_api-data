@@ -1,8 +1,11 @@
-====== Rapport ECIB1 Samuel Platon - DEVOPS4 API
+# **Rapport ECIB1 Samuel Platon - DEVOPS4 API**
+== 
+
+<p> test </p>
 
 
 
-##Faire fonctionner le projet :
+**Faire fonctionner le projet :**
 
 Pour faire fonctionner le projet, il est nécessaire de lancer les requirements afin d'installer ces paquets supplémentaires :
 pandas, spacy, nltk, gensim
