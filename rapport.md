@@ -24,25 +24,25 @@ En paramètres, c représente un personnage, s un numéro de saison et e un num�
 
 ### Vocabulaire d'un personnage :speech_balloon: :
 
-**Route :** 0.0.0.0:5000/vocabulary/c/s/e *(exemple : 0.0.0.0:5000/vocabulary/Cartman/10/1)*
+**Route :** 0.0.0.0:5000/vocabulary/c/s/e *(exemple : 0.0.0.0:5000/vocabulary/Cartman/10/1)*  
 Nb : Pour cette fonctionnalités les mots traités sont lemmatisés et les stopwords retirés.
 Par rapport à un épisode, cette fonctionnalité prend les 10 mots les plus prononcés et les enlève des mots les plus prononcés de notre personnage <c> dans l'épisode. Puis nous retournons les 10 mots les plus prononcés restants de notre personnage <c> de cet épisode, ce qui permet d'obtenir un vocabulaire non pas général mais réellement représentatif d'un personnage pour un épisode.
 
 
 
 ### Retrouver le personnage :eyes: : 
-**Route :** 0.0.0.0:5000/findCharacter
+**Route :** 0.0.0.0:5000/findCharacter  
 Nb : Pour cette fonctionnalités, les mots traités sont lemmatisés et les stopwords retirés.
 Une fois entré dans cette route, notre terminal va nous demander d'entrer une chaîne de caractère, une fois ceci fait, il retournera toutes les lignes de dialogue comprenant cette chaîne sous la forme 'Saison x Episode x | Personnage : Ligne de dialogue'
 Cette fonctionnalité peut être utile pour trouver une expression ou des caractères spécifiques d'un personnage (ex : mom pour cartman) ou d'un episode (ex : hybrid pour l'épisode 2 de la saison 10). 
 
 ### Trouver le sujet :book: :
-**Route :** 0.0.0.0:5000/topic/s/e *(exemple : 0.0.0.0:5000/topic/10/1)*
+**Route :** 0.0.0.0:5000/topic/s/e *(exemple : 0.0.0.0:5000/topic/10/1)*  
 Nb : Pour cette fonctionnalités, les dialogues ne sont pas traités et sont rendus tel quel
 Cette route permet, pour un épisode donné, de retourner les trois 'groupe de sujets' les plus probables pour l'épisode et de présenter les 10 mots de chacun de ces 'groupe de sujets', ainsi pour l'épisode 10 de la saison 2 où la famille de Kyle déménage à san francisco après avoir acheté une voiture hybride, tout cela à cause d'un soucis de pollution, on retrouve bien les mots clés 'san francisco', 'kyle', 'smug', 'hybrid', 'car'.
 
 ### Bonus : Temps de parole :clock130: :  
-**Route :** 0.0.0.0:5000/timeSpeech
+**Route :** 0.0.0.0:5000/timeSpeech  
 Nb : Pour cette fonctionnalités, les dialogues ne sont pas traités et sont rendus tel quel
 Cette route permet de retourner en % le temps de parole des 10 personnages parlant le plus dans l'intégralité de la série.
 Cela permet de se rendre compte réellement de l'importance des personnages dans une série, ainsi on peut voir que Cartman a un temps de parole de 16% alors qu'en deuxième place, Stan parle deux fois moins avec un temps de parole de 8%. Si on compare les résultats de toute la série avec un épisode en particulier, on pourrait réussir à trouver les épisodes caractéristiques de personnages (ex : S10E01 pour Chef, S10E02 pour Kyle) etc...
