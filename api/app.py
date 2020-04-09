@@ -21,50 +21,9 @@ api = Api(app, version='1.0', title='ECI API',
   description='API de projet DEVOPS4 - ECI B1 Samuel Platon',
 )
 
-# Déclaration d'un modèle de donnée utilisé dans l'API, il sert à :
-# - Récupérer automatiquement des paramètres (vous le verrez dans la requête POST)
-# - Générer les sorties de l'API (vous retournez une instance de ce modèle, elle est sérialisée pour vous en JSON automatiquement)
-# - Documenter l'usage de ce modèle, les entrées et les sorties de l'API
-
-todo = api.model('Todo', {
-    'id': fields.Integer(readonly=True, description='The task unique identifier'),
-    'task': fields.String(required=True, description='The task details')
-})
-
-# Déclaration d'une classe pour gérer les opérations CRUD (Create, Read, Update, Delete).
-# Cette classe "fait le travail" et est appelée par les controllers de l'API. Ces derniers n'agissent pas directement sur les données. 
-
-class TodoDAO(object):
-    # Initialisation d'un compteur et d'une liste pour gérer les TODOs
-    def __init__(self):
-        self.counter = 0
-        self.todos = []
-    # Lecture d'un TODO par id (Appelé par /todo/1 par exemple, class TODO, verbe GET)
-    def get(self, id):
-        for todo in self.todos:
-            if todo['id'] == id:
-                return todo
-        api.abort(404, "Todo {} doesn't exist".format(id))
-
-    # Creation d'un TODO (voyez le paramètre data, et la façon dont il est transmis par la méthode post de la classe TodoList)
-    def create(self, data):
-        todo = data
-        todo['id'] = self.counter = self.counter + 1
-        self.todos.append(todo)
-        return todo
-    # Mise à jour d'un TODO
-    def update(self, id, data):
-        todo = self.get(id)
-        todo.update(data)
-        return todo
-    # Suppression d'un TODO
-    def delete(self, id):
-        todo = self.get(id)
-        self.todos.remove(todo)
-
-
 
 # Retrieve and pretreat data
+@api.doc(doc={"Class used to retrieve and pretreat datas"})
 class getDatas(Resource):
 	def get(self):
 		# Loading our stopwords
@@ -268,7 +227,7 @@ class topicModel(Resource):
 		topicsList.append(string)
 		lda_model = LdaModel(corpus=model_corpus, id2word=dictionnaryEpisode, num_topics=3) # We choose to get only the 3 most significant topics
 		for topic_id, topic_keywords in lda_model.show_topics(formatted=False):
-			string = "=== Pour le sujet '"+str(lda_model.show_topic(topic_id, topn=1)[0][0])+"', les mots clefs representatifs sont ==="
+			string = "=== Pour le sujet au mot clé principal '"+str(lda_model.show_topic(topic_id, topn=1)[0][0])+"', les mots clefs representatifs sont ==="
 			topicsList.append(string)
 			# Broswe the keywords of each topic
 			for keyword in topic_keywords:
