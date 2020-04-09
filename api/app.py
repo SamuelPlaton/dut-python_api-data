@@ -226,7 +226,7 @@ class topicModel(Resource):
 		topicsList.append(string)
 		lda_model = LdaModel(corpus=model_corpus, id2word=dictionnaryEpisode, num_topics=3) # We choose to get only the 3 most significant topics
 		for topic_id, topic_keywords in lda_model.show_topics(formatted=False):
-			string = "=== Pour le sujet au mot clé principal '"+str(lda_model.show_topic(topic_id, topn=1)[0][0])+"', les mots clefs representatifs sont ==="
+			string = "=== Pour le sujet au mot cle principal '"+str(lda_model.show_topic(topic_id, topn=1)[0][0])+"', les mots clefs representatifs sont ==="
 			topicsList.append(string)
 			# Broswe the keywords of each topic
 			for keyword in topic_keywords:

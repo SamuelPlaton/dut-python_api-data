@@ -9,7 +9,6 @@ def call(client, path, params):
 
 def test_timeSpeech(client):
 	result = call(client, '/timeSpeech', {})
-	print(result)
 	assert result == {
     "Cartman": "20.19%",
     "Kyle": "7.3%",
@@ -22,3 +21,48 @@ def test_timeSpeech(client):
     "Liane": "1.73%",
     "Mr. Connolly": "1.64%"
 }
+
+def test_vocabulary(client):
+	result = call(client, '/vocabulary/Stan/10/1', {})
+	assert result == [
+    [
+        "come",
+        4
+    ],
+    [
+        "guy",
+        3
+    ],
+    [
+        "say",
+        3
+    ],
+    [
+        "good",
+        3
+    ],
+    [
+        "sex",
+        3
+    ],
+    [
+        "join",
+        2
+    ],
+    [
+        "dude",
+        2
+    ],
+    [
+        "look",
+        2
+    ],
+    [
+        "maybe",
+        2
+    ],
+    [
+        "need",
+        2
+    ]
+]

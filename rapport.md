@@ -19,6 +19,9 @@ Il est aussi nécéssaire de faire 'python3 -m spacy download en_core_web_md' af
 
 **/!\ Pour gagner du temps pendant les tests,  dans la méthode getData() de la classe GetDatas la ligne 'data = pd.concat( [df1[0:4000]] )' permet de ne prendre que les 4000 premières lignes à traiter, les épisodes S10E01 et S10E02 sont 100% fonctionnels avec ces lignes**  
 
+## **Fonctionnement des runners**:
+
+J'ai pu faire fonctionner les runners du projet 'Build>Test>Push>Run' mais depuis un autre dépot Git, depuis des soucis techniques m'ont empêché de le faire fonctionner correctement (Problème d'installation des libraires depuis la forge de l'IUT)
 
 ## **Fonctionnalités :** 
 
@@ -48,6 +51,10 @@ Cette route permet, pour un épisode donné, de retourner les trois 'groupe de s
 Nb : Pour cette fonctionnalités, les dialogues ne sont pas traités et sont rendus tel quel  
 Cette route permet de retourner en % le temps de parole des 10 personnages parlant le plus dans l'intégralité de la série.
 Cela permet de se rendre compte réellement de l'importance des personnages dans une série, ainsi on peut voir que Cartman a un temps de parole de 16% alors qu'en deuxième place, Stan parle deux fois moins avec un temps de parole de 8%. Si on compare les résultats de toute la série avec un épisode en particulier, on pourrait réussir à trouver les épisodes caractéristiques de personnages (ex : S10E01 pour Chef, S10E02 pour Kyle) etc...
+
+## **Tests :**
+
+Les tests du vocabulaire et du timeSpeech fonctionnent. Le test du findCharacter n'est pas fait car il requiert de donner une phrase en input, et pour le topicModel il n'est pas fait car les valeurs de retour des mots clés (leur probabilité) change à chaque return.
 
 ## **Démarche de travail :**
 
