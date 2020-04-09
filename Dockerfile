@@ -14,4 +14,5 @@ RUN pip3 install spacy
 RUN pip3 install nltk
 RUN pip3 install gensim
 RUN python3 -m spacy download en_core_web_md
+
 CMD ["python","api/app.py"]
