@@ -1,7 +1,6 @@
 from flask import request, Flask, jsonify
 from flask_restplus import Api, Resource, fields
 from werkzeug.contrib.fixers import ProxyFix
-import requests
 
 import json
 import string
