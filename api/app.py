@@ -153,7 +153,7 @@ class characterRecognition(Resource):
 		characters = []
 
 		# We ask the user to put a sentence in the terminal
-		sentence = input()
+		sentence = input("Enter a sentence : \n")
 		# We browse our data
 		for x in data.itertuples() :
 			# If we find which character said the sentence
