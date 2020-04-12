@@ -3,3 +3,7 @@ pytest
 
 Werkzeug==0.16.1
 flask-restplus
+pandas
+spacy
+nltk
+gensim
