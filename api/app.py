@@ -8,7 +8,6 @@ import csv
 import pandas as pd # pip3 install pandas
 import spacy #pip3 install spacy ET python3 -m spacy download en_core_web_md
 import nltk #pip3 install nltk
-from flask_swagger import swagger
 from gensim.corpora import Dictionary #pip3 install gensim
 from gensim.utils import simple_preprocess
 from gensim.models import LdaModel
