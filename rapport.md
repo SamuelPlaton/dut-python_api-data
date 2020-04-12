@@ -21,7 +21,7 @@ Il est aussi nécéssaire de faire 'python3 -m spacy download en_core_web_md' af
 
 ## **Fonctionnement des runners**:
 
-J'ai pu faire fonctionner les runners du projet 'Build>Test>Push>Run' mais depuis un autre dépot Git, depuis des soucis techniques m'ont empêché de le faire fonctionner correctement (Problème d'installation des libraires depuis la forge de l'IUT)
+J'ai pu faire fonctionner les runners du projet 'Build>Test>Push>Run' 
 
 ## **Fonctionnalités :** 
 
