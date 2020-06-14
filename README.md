@@ -9,5 +9,5 @@
 **Fonctionnalité 2 :** A partir d'une phrase en entrée, retrouver tous les personnages selon les saisons et épisodes l'ayant prononcée     
 **Fonctionnalité 3 :** Trouver les sujets traités par un épisode à partir des dialogues     
 **Fonctionnalité 4 :** Traiter les dialogues pour trouver le temps de parole (en %) des personnages les plus récurrents        
-**Classement :** En cours       
+**Classement :** 16ème sur 57 projets       
 **Lien :** http://samuelplaton.com/api-python/      
