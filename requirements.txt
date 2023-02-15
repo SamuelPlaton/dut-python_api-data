@@ -1,7 +1,7 @@
 Flask==1.1.1
 pytest
 
-Werkzeug==0.16.1
+Werkzeug==2.2.3
 flask-restplus
 pandas
 spacy
